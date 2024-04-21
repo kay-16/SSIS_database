@@ -10,7 +10,7 @@ class SSISApp:
     def __init__(self, root):  
         self.root = root        
         self.root.title("Simple Student Information System") 
-        root.geometry("950x650")                             
+        root.geometry("1200x700")                             
         root.resizable(width=True, height=True)     
         root.configure(bg = "#000000")
 
@@ -83,7 +83,7 @@ class SSISApp:
     
         """COURSE BUTTONS"""
         # //updates or edits a course 
-        Edit_Course_Button = tk.Button(button_frame, text="Edit Course", font=("Verdana", 10, "bold"),
+        Edit_Course_Button = tk.Button(button_frame, text="Edit Course", font=("Verdana", 10, "bold"), command=self.Select_Course_to_Update,
                                       bg="brown", fg="white")
         Edit_Course_Button.pack(side=tk.RIGHT, padx=5, pady=5)
 
@@ -148,7 +148,7 @@ class SSISApp:
         studentIDnoLabel.grid(row=3, column=0, padx=5, pady=5) 
 
         studentNameLabel = tk.Label(tt_frame, text = "Enter Full Name:", bg="#171717", fg="white", font=("Verdana", 9)) # //label for Student Name input
-        studentNameLabel.grid(row=4, column=0, padx=5, pady=5)            # //place label in tt_frame
+        studentNameLabel.grid(row=4, column=0, padx=5, pady=5)            
 
         studentGenderLabel = tk.Label(tt_frame, text = "Enter Gender:", bg="#171717", fg="white", font=("Verdana", 9))      # //label for Gender input
         studentGenderLabel.grid(row=5, column=0, padx=5, pady=5)         
@@ -234,22 +234,24 @@ class SSISApp:
 
 
         """TEXT WIDGETS"""
-        self.idText = tk.Text(tt_frame, height=1.4, width=35, wrap=tk.NONE) # //ID no. input
+        self.idText = tk.Text(tt_frame, height=1.4, width=42, wrap=tk.NONE) # //ID no. input
         self.idText.grid(row=3, column=0, columnspan=3, padx=5, pady=6)
         self.idText.bind("<Tab>", lambda event: self.next_entry_widget_is(event))
         """when 'tab' key is pressed, it will call function 'next_entry_widget_is' then it will proceed to the next text entry"""
         
-        self.nameText = tk.Text(tt_frame, height=1.4, width=35, wrap=tk.NONE) # //student name input
+        self.nameText = tk.Text(tt_frame, height=1.4, width=42, wrap=tk.NONE) # //student name input
         self.nameText.grid(row=4, column=0, columnspan=3, padx=5, pady=6)       
         self.nameText.bind("<Tab>", lambda event: self.next_entry_widget_is(event))  
 
-        self.genderText = tk.Text(tt_frame, height=1.4, width=35, wrap=tk.NONE) # //gender input
+        self.genderText = tk.Text(tt_frame, height=1.4, width=42, wrap=tk.NONE) # //gender input
         self.genderText.grid(row=5, column=0, columnspan=3, padx=5, pady=6)
         self.genderText.bind("<Tab>", lambda event: self.next_entry_widget_is(event))
 
-        self.yearLevelChoice = ttk.Combobox(tt_frame, height=10, width=44, values=["1st year", "2nd year", "3rd year", "4th year"], state="readonly")
+        # //combobox for year level
+        self.yearLevelChoice = ttk.Combobox(tt_frame, height=10, width=54, values=["1st year", "2nd year", "3rd year", "4th year"], state="readonly")
         self.yearLevelChoice.grid(row=6, column=0, columnspan=5, padx=9, pady=9)
 
+        # //combobox for course
         C.execute("SELECT course_code FROM course")
         options = C.fetchall()
         actual_options = [f"{course_code}" for course_code in options]
@@ -257,7 +259,7 @@ class SSISApp:
         selected.set(actual_options[0])
         connec.commit()
 
-        self.courseChoice = ttk.Combobox(tt_frame, textvariable="selected", values=options, height=10, width=44, state="readonly")
+        self.courseChoice = ttk.Combobox(tt_frame, textvariable="selected", values=options, height=10, width=54, state="readonly")
         self.courseChoice.grid(row=7, column=0, columnspan=3, padx=9, pady=9)
         
         #self.courseCodeText = tk.Text(tt_frame, height=1.4, width=38, wrap=tk.NONE) # //course code input
@@ -267,7 +269,7 @@ class SSISApp:
         # //Used when all texts in text entry widget needs to be cleared after being inputted
         ClearButton = tk.Button(tt_frame, text="Clear All Text", 
                                 command=self.clearInputData, font=("Arial", 10, "italic"))
-        ClearButton.grid(row=6, column=2, columnspan=2, padx=5, pady=5)
+        ClearButton.grid(row=7, column=2, columnspan=2, padx=5, pady=5)
 
  
        
@@ -292,7 +294,6 @@ class SSISApp:
             student_name_input = self.nameText.get('1.0', tk.END).strip()
             student_gender_input = self.genderText.get('1.0', tk.END).strip()
             student_yearlvl_input = self.yearLevelChoice.get()
-            #student_coursecode_input = self.courseCodeText.get('1.0', tk.END).strip()
             student_coursecode_input = self.courseChoice.get()
 
             
@@ -301,6 +302,9 @@ class SSISApp:
                 mb.showerror("Error!", "Please fill in all text entries before saving.")
                 return
             
+            if not student_coursecode_input:
+                student_coursecode_input = None
+
             #//insert data into database
             sv_query = "INSERT INTO student(ID_number, student_name, gender, year_lvl, course_code) VALUES(%s,%s,%s,%s,%s)"
             values = (student_IDno_input, student_name_input, student_gender_input, student_yearlvl_input, student_coursecode_input)
@@ -308,7 +312,7 @@ class SSISApp:
             connec.commit()
 
             #//insert data into treeview
-            self.tree.insert("", "end", text="", values=(student_IDno_input, student_name_input, student_gender_input, student_yearlvl_input, student_coursecode_input))
+            self.stud_tree.insert("", "end", text="", values=(student_IDno_input, student_name_input, student_gender_input, student_yearlvl_input, student_coursecode_input))
 
             mb.showinfo("Data Saved", "Data has been saved successfully.")
         except Exception as e:
@@ -363,13 +367,21 @@ class SSISApp:
 
 # (UPDATE) selects data to be updated 
     def Select_Student_to_Update(self):
+        connec = mysql.connect(
+            host = "localhost",
+            user = "root",
+            password = "elijang0011!!",
+            database = "sql_ssis"
+        )
+        C = connec.cursor()
+
         cur_item = self.stud_tree.focus()
         values = self.stud_tree.item(cur_item, "values")
         print(values)
 
         # //this checks if row is selected
         if not cur_item:
-             mb.showerror("Error!", "Please select a row to edit.")
+             mb.showerror("Error!", "Please select a row (student) to edit.")
              return
     
         # //stores the selected index and original data
@@ -379,36 +391,37 @@ class SSISApp:
         edit_frame = tk.Frame(self.root, width=400, height=320, bg="#D9DDDC", highlightbackground="black", highlightthickness=2) 
         edit_frame.place(x=500, y=345)
 
-        studentIDno_Label = tk.Label(edit_frame, text = "Enter ID number:", bg="#D9DDDC", fg="black")    
-        studentIDno_Label.place(x=50, y=30)
+        studentIDno_Label = tk.Label(edit_frame, text = "Enter new ID number:", bg="#D9DDDC", fg="black")    
+        studentIDno_Label.place(x=30, y=30)
         self.IDno_ent = tk.Text(edit_frame, height=1.4, width=25, wrap=tk.NONE)
         self.IDno_ent.place(x=170, y=30)
         self.IDno_ent.bind("<Tab>", lambda event: self.next_entry_widget_is(event))
 
-        studentName_Label = tk.Label(edit_frame, text = "Enter Full Name:", bg="#D9DDDC", fg="black")    
-        studentName_Label.place(x=50, y=70)
+        studentName_Label = tk.Label(edit_frame, text = "Enter new Full Name:", bg="#D9DDDC", fg="black")    
+        studentName_Label.place(x=30, y=70)
         self.studentName_ent = tk.Text(edit_frame, height=1.4, width=25, wrap=tk.NONE)
         self.studentName_ent.place(x=170, y=70)
         self.studentName_ent.bind("<Tab>", lambda event: self.next_entry_widget_is(event))
 
-        studentGender_Label = tk.Label(edit_frame, text = "Enter Gender:", bg="#D9DDDC", fg="black")    
-        studentGender_Label.place(x=50, y=110)
+        studentGender_Label = tk.Label(edit_frame, text = "Enter new Gender:", bg="#D9DDDC", fg="black")    
+        studentGender_Label.place(x=30, y=110)
         self.studentGender_ent = tk.Text(edit_frame, height=1.4, width=25, wrap=tk.NONE)
         self.studentGender_ent.place(x=170, y=110)
         self.studentGender_ent.bind("<Tab>", lambda event: self.next_entry_widget_is(event))
         
-        studentYearlvl_Label = tk.Label(edit_frame, text = "Enter Year Level:", bg="#D9DDDC", fg="black")    
-        studentYearlvl_Label.place(x=50, y=150)
+        studentYearlvl_Label = tk.Label(edit_frame, text = "Enter new Year Level:", bg="#D9DDDC", fg="black")    
+        studentYearlvl_Label.place(x=30, y=150)
         self.yearLevelChoice = ttk.Combobox(edit_frame, height=10, width=30, values=["1st year", "2nd year", "3rd year", "4th year"], state="readonly")
         self.yearLevelChoice.place(x=170, y=150)
         
-        studentCourseCode_Label = tk.Label(edit_frame, text = "Enter Course Code:", bg="#D9DDDC", fg="black")    
-        studentCourseCode_Label.place(x=50, y=190)
-        self.courseChoice = ttk.Combobox(edit_frame, height=10, width=30)
-        self.courseChoice.place(x=170, y=190)
-        #self.studentCourseCode_ent = tk.Text(edit_frame, height=1.4, width=25, wrap=tk.NONE)
-        #self.studentCourseCode_ent.place(x=170, y=190)
         
+        C.execute("SELECT course_code from course")
+        options=C.fetchall()
+        actual_options = [course_code[0] for course_code in options]
+        studentcourseChoice_Label = tk.Label(edit_frame, text = "Enter new Course Code:", bg="#D9DDDC", fg="black")    
+        studentcourseChoice_Label.place(x=30, y=190)
+        self.courseChoice = ttk.Combobox(edit_frame, textvariable="selected", values=actual_options, height=10, width=30, state="readonly")
+        self.courseChoice.place(x=170, y=190)
 
         self.IDno_ent.insert("1.0", self.orig_data[0])
         self.studentName_ent.insert("1.0", self.orig_data[1])
@@ -447,22 +460,28 @@ class SSISApp:
         yearlvl_text = self.yearLevelChoice.get()
         courseCode_text = self.courseChoice.get()
 
-        C.execute("UPDATE student SET ID_number=%s, student_name=%s, gender=%s, year_lvl=%s, course_code=%s WHERE ID_number=%s",
-                (id_text, name_text, gender_text, yearlvl_text, courseCode_text, old_id_text))
-            
-        connec.commit()
-        mb.showinfo("Successfully Edited", "Item edited and saved.")
+        try: 
+            # Update the data if the ID is unique
+            C.execute("UPDATE student SET ID_number=%s, student_name=%s, gender=%s, year_lvl=%s, course_code=%s WHERE ID_number=%s",
+                    (id_text, name_text, gender_text, yearlvl_text, courseCode_text, old_id_text))
+            connec.commit()
+            mb.showinfo("Successfully Edited", "Item edited and saved.")
+        
         
         # //updates all the new data in the treeview
-        self.stud_tree.item(self.stud_tree.focus(), values=(id_text, name_text, gender_text, yearlvl_text, courseCode_text))
+            self.stud_tree.item(self.stud_tree.focus(), values=(id_text, name_text, gender_text, yearlvl_text, courseCode_text))
 
-        self.idText.delete("1.0", tk.END)
-        self.nameText.delete("1.0", tk.END)
-        self.genderText.delete("1.0", tk.END)
-        self.yearLevelChoice.set(self.orig_data[3])
-        self.courseChoice.set(self.orig_data[4])
+            self.idText.delete("1.0", tk.END)
+            self.nameText.delete("1.0", tk.END)
+            self.genderText.delete("1.0", tk.END)
+            self.yearLevelChoice.set(self.orig_data[3])
+            self.courseChoice.set(self.orig_data[4])
+        
+        except Exception as e:
+            mb.showerror("Error!", f"An error has occurred: {e}")
 
-        connec.close()
+        finally:
+            connec.close()
 
        
 # (SEARCH) called when search button is clicked
@@ -484,8 +503,9 @@ class SSISApp:
             self.stud_tree.delete(item)
 
         # //execute query to fetch student data by their ID no.
-        s_query = ("SELECT * FROM student WHERE ID_number = %s")
-        C.execute(s_query, (what_to_search,))
+        s_query = "SELECT * FROM student WHERE ID_number = %s OR student_name = %s OR gender = %s OR year_lvl = %s OR course_code = %s"
+
+        C.execute(s_query, (what_to_search, what_to_search, what_to_search, what_to_search, what_to_search,))
         result = C.fetchall()
 
         #//update treeview with the fetched data
@@ -529,7 +549,7 @@ class SSISApp:
 
 
     """--------COURSE FUNCTIONS USED--------""" 
-# (ADD)
+#(ADD) add course
     def Add_course(self):
         connec = mysql.connect(
             host = "localhost",
@@ -550,12 +570,17 @@ class SSISApp:
             mb.showerror("Error!", "Course name is required.")
             return
     
-        
-        ins_query = "INSERT INTO course (course_code, course_name) VALUES (%s, %s)"
-        C.execute(ins_query, (course_code, course_code))
-        connec.commit()
+        try:
+            add_query = "INSERT INTO course (course_code, course_name) VALUES (%s, %s)"
+            C.execute(add_query, (course_code, course_name))
+            connec.commit()
+            self.course_tree.insert("", "end", text="", values=(course_code, course_name))
+            mb.showinfo("Successfully Added", f"Course '{course_code}' added successfully")
 
-        connec.close()
+        except Exception as e:
+            mb.showerror("Error!", f"An error occurred: {e}")
+        finally:
+            connec.close()
 
 
 # (DELETE) selects a student data to delete
@@ -609,26 +634,26 @@ class SSISApp:
 
         # //this checks if row is selected
         if not cur_item:
-             mb.showerror("Error!", "Please select a row to edit.")
+             mb.showerror("Error!", "Please select a row (course) to edit.")
              return
     
         # //stores the selected index and original data
         self.data_to_be_edited = cur_item[0]
         self.orig_data = self.course_tree.item(cur_item)["values"] 
 
-        edit_frame = tk.Frame(self.root, width=400, height=320, bg="#D9DDDC", highlightbackground="black", highlightthickness=2) 
+        edit_frame = tk.Frame(self.root, width=400, height=280, bg="#D9DDDC", highlightbackground="black", highlightthickness=2) 
         edit_frame.place(x=500, y=345)
 
         courseCod_Label = tk.Label(edit_frame, text = "Enter new Course Code:", bg="#D9DDDC", fg="black")    
         courseCod_Label.place(x=50, y=30)
         self.courseCod_ent = tk.Text(edit_frame, height=1.4, width=25, wrap=tk.NONE)
-        self.courseCod_ent.place(x=170, y=30)
+        self.courseCod_ent.place(x=100, y=60)
         self.courseCod_ent.bind("<Tab>", lambda event: self.next_entry_widget_is(event))
 
         courseName_Label = tk.Label(edit_frame, text = "Enter new Course Name:", bg="#D9DDDC", fg="black")    
-        courseName_Label.place(x=50, y=70)
-        self.courseName_ent = tk.Text(edit_frame, height=1.4, width=25, wrap=tk.NONE)
-        self.courseName_ent.place(x=170, y=70)
+        courseName_Label.place(x=50, y=100)
+        self.courseName_ent = tk.Text(edit_frame, height=1.4, width=35, wrap=tk.NONE)
+        self.courseName_ent.place(x=65, y=140)
         self.courseName_ent.bind("<Tab>", lambda event: self.next_entry_widget_is(event))
 
         self.courseCod_ent.insert("1.0", self.orig_data[0])
@@ -637,12 +662,12 @@ class SSISApp:
         # //update button
         save_Edited_Button = tk.Button(edit_frame, text="Update", command=lambda: self.Update_course(),
                                  font=("Arial", 10, "bold"), bg="#005C29", fg="white")
-        save_Edited_Button.place(x=90, y=270)
+        save_Edited_Button.place(x=90, y=230)
 
         # //cancel button
         cancelButton = tk.Button(edit_frame, text="Cancel", command=edit_frame.destroy,
                                  font=("Arial", 11, "italic"), bg="#BA110C", fg="white")               
-        cancelButton.place(x=230, y=270)
+        cancelButton.place(x=230, y=230)
 
 
 # updates the data 
@@ -661,20 +686,24 @@ class SSISApp:
         c_Code_text = self.courseCod_ent.get("1.0", tk.END).strip()
         c_Name_text = self.courseName_ent.get("1.0" ,tk.END).strip()
         
-
-        C.execute("UPDATE course SET course_code=%s, course_name=%s WHERE course_code=%s",
-                (c_Code_text, c_Name_text, old_course_code))
+        try: 
+            C.execute("UPDATE course SET course_code=%s, course_name=%s WHERE course_code=%s",
+                    (c_Code_text, c_Name_text, old_course_code))
             
-        connec.commit()
-        mb.showinfo("Successfully Edited", "New Course is saved and edited.")
+            connec.commit()
+            mb.showinfo("Successfully Edited", "New Course is saved and edited.")
         
-        # //updates all the new data in the treeview
-        self.course_tree.item(self.course_tree.focus(), values=(c_Code_text, c_Name_text, old_course_code))
+            # //updates all the new data in the treeview
+            self.course_tree.item(self.course_tree.focus(), values=(c_Code_text, c_Name_text, old_course_code))
 
-        self.c_Code_text.delete("1.0", tk.END)
-        self.c_Name_text.delete("1.0", tk.END)
-        
-        connec.close()
+            self.courseCod_ent.delete("1.0", tk.END)
+            self.courseName_ent.delete("1.0", tk.END)
+
+        except mysql.Error as e:
+            mb.showerror("Error!", f"An error occurred: {e}")
+
+        finally:
+            connec.close()
 
 
 #(SEARCH)
@@ -696,8 +725,8 @@ class SSISApp:
             self.course_tree.delete(item)
 
         # //execute query to fetch student data by their ID no.
-        s_query = ("SELECT * FROM course WHERE course_code = %s")
-        C.execute(s_query, (what_to_search,))
+        s_query = ("SELECT * FROM course WHERE course_code = %s OR course_name = %s")
+        C.execute(s_query, (what_to_search, what_to_search))
         result = C.fetchall()
 
         #//update treeview with the fetched data
