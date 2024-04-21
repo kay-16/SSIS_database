@@ -1,4 +1,4 @@
-/*INSERT INTO student (ID_number, student_name, gender, year_lvl, course_code)
+INSERT INTO student (ID_number, student_name, gender, year_lvl, course_code)
 VALUES ("2023-6230", "Lou Grace R. Yanong", "female", "1st year", "BSCS"),
 	   ("2021-3144", "Karen G. Smith", "female", "2nd year", "BSCE"),				
        ("2021-5736", "Merlia P. Summers", "female", "2nd year", "BSCE"),
@@ -95,18 +95,18 @@ VALUES ("2023-6230", "Lou Grace R. Yanong", "female", "1st year", "BSCS"),
 		("2023-8774", "James Hunt", "male", "1st year", "BSStats"),
 		("2023-4330", "Olivia Schmidt", "female", "2nd year", "BSCS"),
 		("2023-3465", "William Bradley", "male", "3rd year", "BSIT"),
-		("2023-7899", "Jane Chapman", "female", "4th year", "BSA");*/
+		("2023-7899", "Jane Chapman", "female", "4th year", "BSA");
 
 
-/*UPDATE student
+UPDATE student
 SET course_code = NULL
 WHERE ID_number = "2023-1327";
-SELECT * FROM student;*/
+SELECT * FROM student;
 
 
-#SET SQL_SAFE_UPDATES = 0;
+SET SQL_SAFE_UPDATES = 0;
 
-/*INSERT INTO course (course_code, course_name)
+INSERT INTO course (course_code, course_name)
 VALUES ("BSN", "Bachelor of Science in Nursing"),
        ("BSComEng", "Bachelor of Science in Computer Engineering"),
        ("BSEE", "Bachelor of Science in Electrical Engineering"),
@@ -121,34 +121,28 @@ VALUES ("BSN", "Bachelor of Science in Nursing"),
 	   ("BSIT", "Bachelor of Science in Information Technology"),
 	   ("BSA", "Bachelor of Science in Accountancy"),
 	   ("BSBM", "Bachelor of Science in Business Management"),
-	   ("BSE", "Bachelor of Science in Economics");*/
+	   ("BSE", "Bachelor of Science in Economics");
 
-/*ALTER TABLE student
+ALTER TABLE student
 ADD CONSTRAINT
-PRIMARY KEY(ID_number);*/
+PRIMARY KEY(ID_number);
 
-/*ALTER TABLE course
+ALTER TABLE course
 ADD CONSTRAINT
-PRIMARY KEY(course_code);*/
+PRIMARY KEY(course_code);
 
-/*ALTER TABLE student
+ALTER TABLE student
 ADD CONSTRAINT fk_course_code
-FOREIGN KEY(course_code) REFERENCES course(course_code);*/
+FOREIGN KEY(course_code) REFERENCES course(course_code);
 
-/*SELECT *
-FROM student LEFT JOIN course
-ON student.coursstudente_code = course.course_code;*/
+ALTER TABLE student
+MODIFY year_lvl VARCHAR(20) NOT NULL;
 
-/*ALTER TABLE student
-MODIFY year_lvl VARCHAR(20) NOT NULL;*/
+ALTER TABLE student 
+MODIFY COLUMN year_lvl VARCHAR(50);
 
-#ALTER TABLE student 
-#MODIFY COLUMN year_lvl VARCHAR(50);
+SELECT * FROM course
+SELECT * FROM student;
 
-#SELECT * FROM course
-#SELECT * FROM student;
 
-/*UPDATE student 
-SET ID_number="2023-1112", student_name="Eli Y. Jong", gender="male", year_lvl="1st year", course_code="BSCS" 
-WHERE ID_number="2023-9090";*/
 
