@@ -49,21 +49,11 @@ class SSISApp:
         button_frame.pack(side=tk.BOTTOM, fill=tk.X, padx=20, pady=20) 
         #highlightbackground="white", highlightthickness=1, 
         
-        # //returns to home page(student data) within the treeview
-        Back_Stud_Button = tk.Button(button_frame, text="back", font=("Verdana", 10, "italic"), command=self.Open_student,
-                               bg="black", fg="white")
-        Back_Stud_Button.pack(side=tk.LEFT, padx=5, pady=5)               
-
-        # //returns to home page(student data) within the treeview
-        Back_Course_Button = tk.Button(button_frame, text="back", font=("Verdana", 10, "italic"), command=self.Open_course,
-                               bg="black", fg="white")
-        Back_Course_Button.pack(side=tk.RIGHT, padx=5, pady=5)
-         
-
+                
     # S T U D E N T  B U T T O N S   
         # //updates student data 
         Edit_Student_Button = tk.Button(button_frame, text="Edit Student", font=("Verdana", 10, "bold"), command=self.Select_Student_to_Update,
-                               bg="yellow")
+                               bg="#EEFC5E", fg="black")
         Edit_Student_Button.pack(side=tk.LEFT, padx=5, pady=5)    
 
 
@@ -82,17 +72,17 @@ class SSISApp:
     # C O U R S E  B U T T O N S
         # //updates or edits a course 
         Edit_Course_Button = tk.Button(button_frame, text="Edit Course", font=("Verdana", 10, "bold"), command=self.Select_Course_to_Update,
-                                      bg="brown", fg="white")
+                                      bg="#EEFC5E", fg="black")
         Edit_Course_Button.pack(side=tk.RIGHT, padx=5, pady=5)
 
         # //removes a course
         Course_Delete_Button = tk.Button(button_frame, text="Delete Course", font=("Verdana", 10, "bold"), command=self.Delete_course,
-                                         bg="lavender", fg="black")
+                                         bg="red", fg="white")
         Course_Delete_Button.pack(side=tk.RIGHT, padx=5, pady=5)
 
         # //adds a course 
         Add_Course_Button = tk.Button(button_frame, text="Add Course", font=("Verdana", 10, "bold"), command=self.Add_course,
-                                      bg="light blue", fg="black")
+                                      bg="#4FC978", fg="black")
         Add_Course_Button.pack(side=tk.RIGHT, padx=5, pady=5)
 
 
@@ -100,7 +90,11 @@ class SSISApp:
         # //exclusive frame for 'Search'
         s_frame = tk.Frame (self.root, bg="#171717")
         s_frame.pack(side=tk.TOP, fill=tk.X, padx=20, pady=20)
-        #highlightbackground="light gray", highlightthickness=1,
+
+        # //returns to home page(student data) within the treeview
+        Back_Course_Button = tk.Button(s_frame, text="back", font=("Verdana", 10, "italic"), command=self.Open_course,
+                               bg="gray", fg="white")
+        Back_Course_Button.pack(side=tk.RIGHT, padx=5, pady=5)
 
         tk.Label(s_frame, text="Search by ID no.:", bg="#171717", fg="white", font=("Verdana", 9, "italic")).pack(side=tk.LEFT)
         self.searchStudentText = tk.Entry(s_frame, width=40)
@@ -111,8 +105,12 @@ class SSISApp:
                                  bg="white")
         Search_stud_Button.pack(side=tk.LEFT, padx=5, pady=5)         
         
-        # //Search or filter courses based on course code
+        # //returns to home page(student data) within the treeview
+        Back_Stud_Button = tk.Button(s_frame, text="back", font=("Verdana", 10, "italic"), command=self.Open_student,
+                               bg="gray", fg="white")
+        Back_Stud_Button.pack(side=tk.LEFT, padx=5, pady=5)
 
+        # //Search or filter courses based on course code
         Search_course_Button = tk.Button(s_frame, text="Search", font=("Verdana", 10, "bold"), command=self.Search_course,
                                  bg="white")
         Search_course_Button.pack(side=tk.RIGHT, padx=5, pady=5)   
@@ -184,7 +182,7 @@ class SSISApp:
 
         # //vertical scrollbar
         scrollbar = ttk.Scrollbar(tt_frame, orient="vertical", command=self.stud_tree.yview)
-        scrollbar.grid(row=1, column=1, padx=(10, 0), pady=10, sticky="ns")
+        scrollbar.grid(row=1, column=1, padx=(1.5, 0), pady=10, sticky="ns")
         self.stud_tree.configure(yscrollcommand=scrollbar.set)
 
 
@@ -215,11 +213,11 @@ class SSISApp:
         self.course_tree.grid(row=1, column=2, padx=(10, 0), pady=10, sticky="nsew")
 
         # //vertical scrollbar
-        scrollbar = ttk.Scrollbar(tt_frame, orient="vertical", command=self.course_tree.yview)
-        scrollbar.grid(row=1, column=5, padx=(10, 0), pady=10, sticky="ns")
-        self.course_tree.configure(yscrollcommand=scrollbar.set)
+        vscrollbar = ttk.Scrollbar(tt_frame, orient="vertical", command=self.course_tree.yview)
+        vscrollbar.grid(row=1, column=5, padx=(1.5, 0), pady=10, sticky="ns")
+        self.course_tree.configure(yscrollcommand=vscrollbar.set)
 
-
+        
     # T E X T  W I D G E T S 
         self.idText = tk.Text(tt_frame, height=1.4, width=42, wrap=tk.NONE) # //ID no. input
         self.idText.grid(row=3, column=0, columnspan=3, padx=5, pady=6)
@@ -491,6 +489,16 @@ class SSISApp:
             self.yearLevelChoice.set(self.orig_data[3])
             self.courseChoice.set(self.orig_data[4])
         
+            # //fetch and print the newly updated data from the database
+            C.execute("SELECT * FROM student WHERE ID_number=%s", (id_text,))
+            updated_data = C.fetchone()
+            print("Newly Updated Student Data:")
+            print("ID Number:", updated_data[0])
+            print("Name:", updated_data[1])
+            print("Gender:", updated_data[2])
+            print("Year Level:", updated_data[3])
+            print("Course Code:", updated_data[4])
+
         except Exception as e:
             mb.showerror("Error!", f"An error has occurred: {e}")
         finally:
@@ -776,9 +784,15 @@ class SSISApp:
             + " FOREIGN KEY (course_code) REFERENCES course(course_code) ON DELETE SET NULL;")
             
             C.execute(add_back_query)
-            mb.showinfo("Successfully Edited", "New Course is saved and edited.")
             connec.commit()
             
+            # //print the newly updated data
+            print("Successfully Edited:")
+            print("Course Code:", c_Code_text)
+            print("Course Name:", c_Name_text)
+
+            mb.showinfo("Successfully Edited", "New Course is saved and edited.")
+
         except mysql.Error as e:
             mb.showerror("Error!", f"An error occurred: {e}")
         finally:
@@ -877,4 +891,3 @@ if __name__ == "__main__":
     app = SSISApp(root)
     root.mainloop()
     
-
