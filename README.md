@@ -7,9 +7,9 @@ How it works:
 
 2.) After inputting all student data, click the "Save Student" button to save.
 
-3.) Course code will display "None" if you:
+3.) Course code will display "None" (which means not enrolled) if you:
 - wish to leave out the 'Course Code' combobox; or
-- select the "N/A" option (which means not enrolled)
+- select the "N/A" option 
 
 4.) To UPDATE student data/course, select a row you want to edit from the student table/course table you wish to edit, then click the "Edit Student" / "Edit Course" button to proceed with editing. The original data will appear in another frame where the actual editing happens. When done, click the "Update" button to save changes or the "cancel" button to cancel changes.
 
