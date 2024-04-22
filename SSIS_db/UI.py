@@ -247,36 +247,49 @@ class SSISApp:
         self.genderText.grid(row=5, column=0, columnspan=3, padx=5, pady=6)
         self.genderText.bind("<Tab>", lambda event: self.next_entry_widget_is(event))
 
-        # //combobox for year level
-        self.yearLevelChoice = ttk.Combobox(tt_frame, height=10, width=54, values=["1st year", "2nd year", "3rd year", "4th year"], state="readonly")
-        self.yearLevelChoice.grid(row=6, column=0, columnspan=5, padx=9, pady=9)
-
-        # //combobox for course
-        C.execute("SELECT course_code FROM course")
-        options = C.fetchall()
-        actual_options = [f"{course_code}" for course_code in options]
-        selected = tk.StringVar(tt_frame)
-        selected.set(actual_options[0])
-        connec.commit()
-
-        self.courseChoice = ttk.Combobox(tt_frame, textvariable="selected", values=options, height=10, width=54, state="readonly")
-        self.courseChoice.grid(row=7, column=0, columnspan=3, padx=9, pady=9)
-        
-        #self.courseCodeText = tk.Text(tt_frame, height=1.4, width=38, wrap=tk.NONE) # //course code input
-        #self.courseCodeText.grid(row=6, column=0, columnspan=3, padx=5, pady=6)
-        #self.courseCodeText.bind("<Tab>", lambda event: self.next_entry_widget_is(event))
-
-        # //Used when all texts in text entry widget needs to be cleared after being inputted
+        # //clears all texts entered in text entry widgets
         ClearButton = tk.Button(tt_frame, text="Clear All Text", 
                                 command=self.clearInputData, font=("Arial", 10, "italic"))
         ClearButton.grid(row=7, column=2, columnspan=2, padx=5, pady=5)
 
- 
+        # //combobox for year level
+        self.yearLevelChoice = ttk.Combobox(tt_frame, height=10, width=54, values=["1st year", "2nd year", "3rd year", "4th year"], state="readonly")
+        self.yearLevelChoice.grid(row=6, column=0, columnspan=5, padx=9, pady=9)
+
+        # //combobox for course code
+        C.execute("SELECT course_code FROM course")
+        options = C.fetchall()
+        actual_options = [course[0] for course in options]
+        actual_options.insert(0, "N/A")
+        selected = tk.StringVar(tt_frame)
+        selected.set(actual_options[0])
+        connec.commit()
+        
+        self.courseChoice = ttk.Combobox(tt_frame, textvariable="selected", values=actual_options, height=10, width=54, state="readonly")
+        self.courseChoice.grid(row=7, column=0, columnspan=3, padx=9, pady=9)
+
+        
+    def course_select(self):
+        connec = mysql.connect(
+            host = "localhost",
+            user = "root",
+            password = "elijang0011!!",
+            database = "sql_ssis"
+        )
+        C = connec.cursor()
+
+        selected_course = self.courseChoice.get()
+        if selected_course == "N/A":
+            C.execeute("UPDATE student SET course_code = NULL WHERE ID_number = %s")
+            connec.commit()
+
+        else:
+            pass
+
+        self.courseChoice.bind("<<ComboboxSelected>>", self.course_select)
        
 
-
         """--------STUDENT FUNCTIONS USED--------""" 
-
 # (SAVE) to save the existing data
     def Save_student(self):
         connec = mysql.connect(
@@ -289,14 +302,13 @@ class SSISApp:
         try:
             C = connec.cursor()
          
-        # //get data from each text entries
+        # //get data from each text entries and comboboxes
             student_IDno_input = self.idText.get('1.0', tk.END).strip()
             student_name_input = self.nameText.get('1.0', tk.END).strip()
             student_gender_input = self.genderText.get('1.0', tk.END).strip()
             student_yearlvl_input = self.yearLevelChoice.get()
             student_coursecode_input = self.courseChoice.get()
 
-            
         # //checks if any text entry is empty, except for course code entry
             if not all([student_name_input, student_IDno_input, student_gender_input]):
                 mb.showerror("Error!", "Please fill in all text entries before saving.")
@@ -515,6 +527,7 @@ class SSISApp:
         # //display message if no data is matched from search entry
         if not result:
             mb.showinfo("No Results", "No matching records found.")
+            self.Open_student()
 
         connec.close()
 
@@ -736,6 +749,7 @@ class SSISApp:
         # //display message if no data is matched from search entry
         if not result:
             mb.showinfo("No Results", "No matching records found.")
+            self.Open_course()
 
         connec.close()
 
@@ -781,8 +795,7 @@ class SSISApp:
         self.idText.delete("1.0", tk.END)
         self.nameText.delete("1.0", tk.END)
         self.genderText.delete("1.0", tk.END)
-        self.courseCodeText.delete("1.0", tk.END)   
-
+          
 
 # adjusts column width dynamically
     def adjustColumnWidths(self):
