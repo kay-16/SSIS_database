@@ -3,7 +3,7 @@ A Simple Student Information System
 
 How it works:
 
-1.) Enter IDnumber, full name, gender, year level, and course code in their corresponding text entries.
+1.) Enter ID number, full name, gender, year level, and course code in their corresponding text entries.
 
 2.) After inputting all student data, click the "Save Student" button to save.
 
